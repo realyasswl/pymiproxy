@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 
-from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
-from urlparse import urlparse, urlunparse, ParseResult
-from SocketServer import ThreadingMixIn
-from httplib import HTTPResponse
+#from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
+from http.server import HTTPServer, BaseHTTPRequestHandler
+#from urlparse import urlparse, urlunparse, ParseResult
+from urllib.parse import urlparse, urlunparse, ParseResult
+#from SocketServer import ThreadingMixIn
+from socketserver import ThreadingMixIn
+#from httplib import HTTPResponse
+from http.client import HTTPResponse
 from tempfile import gettempdir
 from os import path, listdir
 from ssl import wrap_socket
@@ -179,7 +183,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
             self.end_headers()
             #self.request.sendall('%s 200 Connection established\r\n\r\n' % self.request_version)
             self._transition_to_ssl()
-        except Exception, e:
+        except Exception as e:
             self.send_error(500, str(e))
             return
 
@@ -196,7 +200,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
             try:
                 # Connect to destination
                 self._connect_to_host()
-            except Exception, e:
+            except Exception as e:
                 self.send_error(500, str(e))
                 return
             # Extract path
@@ -295,22 +299,22 @@ class AsyncMitmProxy(ThreadingMixIn, MitmProxy):
 class MitmProxyHandler(ProxyHandler):
 
     def mitm_request(self, data):
-        print '>> %s' % repr(data[:100])
+        print ('>> %s' % repr(data[:100]))
         return data
 
     def mitm_response(self, data):
-        print '<< %s' % repr(data[:100])
+        print ('<< %s' % repr(data[:100]))
         return data
 
 
 class DebugInterceptor(RequestInterceptorPlugin, ResponseInterceptorPlugin):
 
         def do_request(self, data):
-            print '>> %s' % repr(data[:100])
+            print ('>> %s' % repr(data[:100]))
             return data
 
         def do_response(self, data):
-            print '<< %s' % repr(data[:100])
+            print ('<< %s' % repr(data[:100]))
             return data
 
 
